@@ -7,7 +7,6 @@ import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,8 +41,6 @@ public class CsvQuestionDao implements QuestionDao {
                         .withSkipLines(1)
                         .build().parse();
             }
-        } catch (FileNotFoundException e) {
-            throw new QuestionReadException("Resource file not found: " + fileName, e);
         } catch (IOException e) {
             throw new QuestionReadException("Cant read resource file: " + fileName, e);
         }
