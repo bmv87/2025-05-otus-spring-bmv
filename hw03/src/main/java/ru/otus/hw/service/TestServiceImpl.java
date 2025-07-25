@@ -21,6 +21,21 @@ public class TestServiceImpl implements TestService {
 
     private final QuestionDao questionDao;
 
+    @Override
+    public TestResult executeTestFor(Student student) {
+        printStartTestMessage();
+
+        var testResult = new TestResult(student);
+        List<Question> questions = tryGetQuestions();
+        if (questions.isEmpty()) {
+            return testResult;
+        }
+
+        ask(questions, testResult);
+
+        return testResult;
+    }
+
     private void printAnswers(List<Answer> answers) {
         for (int i = 0; i < answers.size(); i++) {
             ioService.printFormattedLine("%5s%d. %s", " ", i + 1, answers.get(i).text());
@@ -73,18 +88,4 @@ public class TestServiceImpl implements TestService {
         }
     }
 
-    @Override
-    public TestResult executeTestFor(Student student) {
-        printStartTestMessage();
-
-        var testResult = new TestResult(student);
-        List<Question> questions = tryGetQuestions();
-        if (questions.isEmpty()) {
-            return testResult;
-        }
-
-        ask(questions, testResult);
-
-        return testResult;
-    }
 }
