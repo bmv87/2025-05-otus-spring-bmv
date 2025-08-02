@@ -3,14 +3,12 @@ package ru.otus.hw.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.otus.hw.domain.Student;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +19,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @DisplayName("Test Service methods must to")
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class TestServiceImplTest {
 

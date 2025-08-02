@@ -3,14 +3,9 @@ package ru.otus.hw.dao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
@@ -18,17 +13,8 @@ import ru.otus.hw.exceptions.QuestionReadException;
 import static org.mockito.BDDMockito.given;
 
 @DisplayName("Csv Question Dao findAll method must")
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {CsvQuestionDao.class, CsvToBeanReaderImpl.class})
 public class CsvQuestionDaoTest {
-
-    @ComponentScan(
-            basePackages = "ru.otus.hw.dao",
-            includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {CsvQuestionDao.class})
-    )
-    @Configuration
-    static class NestedConfiguration {
-    }
 
     @MockitoBean
     private TestFileNameProvider testFileNameProvider;
