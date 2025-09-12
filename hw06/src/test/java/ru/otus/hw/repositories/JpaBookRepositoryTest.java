@@ -47,8 +47,11 @@ class JpaBookRepositoryTest {
     @MethodSource("getDbBooks")
     void shouldReturnCorrectBookById(Book expectedBook) {
         var actualBook = repositoryJpa.findById(expectedBook.getId());
-        assertThat(actualBook).isPresent()
+        assertThat(actualBook)
+                .isPresent()
                 .get()
+                .usingRecursiveComparison()
+                .ignoringFields("comments")
                 .isEqualTo(expectedBook);
     }
 
@@ -58,7 +61,10 @@ class JpaBookRepositoryTest {
         var actualBooks = repositoryJpa.findAll();
         var expectedBooks = dbBooks;
 
-        assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
+        assertThat(actualBooks)
+                .isNotEmpty()
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("comments")
+                .containsExactlyElementsOf(expectedBooks);
         actualBooks.forEach(System.out::println);
     }
 
@@ -87,6 +93,7 @@ class JpaBookRepositoryTest {
         assertThat(repositoryJpa.findById(expectedBook.getId()))
                 .isPresent()
                 .get()
+                .usingRecursiveComparison()
                 .isNotEqualTo(expectedBook);
 
         var returnedBook = repositoryJpa.save(expectedBook);
@@ -97,6 +104,7 @@ class JpaBookRepositoryTest {
         assertThat(repositoryJpa.findById(returnedBook.getId()))
                 .isPresent()
                 .get()
+                .usingRecursiveComparison()
                 .isEqualTo(returnedBook);
     }
 

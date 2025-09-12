@@ -30,7 +30,10 @@ class JpaGenreRepositoryTest {
     void shouldReturnAllGenres() {
         var expectedGenres = getDbGenres(1, 7);
         var actualGenres = repositoryJpa.findAll();
-        assertThat(actualGenres).isNotEmpty().containsExactlyElementsOf(expectedGenres);
+        assertThat(actualGenres)
+                .isNotEmpty()
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyElementsOf(expectedGenres);
         actualGenres.forEach(System.out::println);
     }
 
@@ -40,7 +43,10 @@ class JpaGenreRepositoryTest {
         var expectedGenres = getDbGenres(2, 4);
         var ids = expectedGenres.stream().map(Genre::getId).collect(Collectors.toSet());
         var actualGenres = repositoryJpa.findAllByIds(ids);
-        assertThat(actualGenres).isNotEmpty().isEqualTo(expectedGenres);
+        assertThat(actualGenres)
+                .isNotEmpty()
+                .usingRecursiveComparison()
+                .isEqualTo(expectedGenres);
         actualGenres.forEach(System.out::println);
     }
 

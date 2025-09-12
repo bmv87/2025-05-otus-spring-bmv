@@ -13,24 +13,32 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedEntityGraphs;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "books")
-@NamedEntityGraph(name = "books-authors-entity-graph",
-        attributeNodes = {@NamedAttributeNode("author")})
+@NamedEntityGraphs({
+        @NamedEntityGraph(name = "books-authors-entity-graph",
+                attributeNodes = {@NamedAttributeNode("author")}),
+        @NamedEntityGraph(name = "books-authors-genres-entity-graph",
+                attributeNodes = {
+                        @NamedAttributeNode("author"),
+                        @NamedAttributeNode("genres")
+                })
+})
 public class Book {
 
     @Id
@@ -45,8 +53,6 @@ public class Book {
     @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Author author;
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     @BatchSize(size = 100)
     @ManyToMany(targetEntity = Genre.class, fetch = FetchType.LAZY)
     @JoinTable(name = "books_genres",
@@ -54,8 +60,7 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "genre_id", referencedColumnName = "id"))
     private List<Genre> genres;
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "book", targetEntity = Comment.class,
             cascade = {CascadeType.REMOVE, CascadeType.DETACH}, fetch = FetchType.LAZY)
     private List<Comment> comments;

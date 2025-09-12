@@ -1,8 +1,8 @@
 package ru.otus.hw.services;
 
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
@@ -38,13 +38,20 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public Book insert(String title, long authorId, Set<Long> genresIds) {
-        return save(0, title, authorId, genresIds);
+        var newBook = new Book();
+        newBook.setId(0);
+        validateAndFill(newBook, title, authorId, genresIds);
+        return bookRepository.save(newBook);
     }
 
     @Override
     @Transactional
     public Book update(long id, String title, long authorId, Set<Long> genresIds) {
-        return save(id, title, authorId, genresIds);
+        var book = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+
+        validateAndFill(book, title, authorId, genresIds);
+        return bookRepository.save(book);
     }
 
     @Override
@@ -53,7 +60,7 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-    private Book save(long id, String title, long authorId, Set<Long> genresIds) {
+    private void validateAndFill(Book book, String title, long authorId, Set<Long> genresIds) {
         if (isEmpty(genresIds)) {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
@@ -64,8 +71,8 @@ public class BookServiceImpl implements BookService {
         if (isEmpty(genres) || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
-
-        var book = new Book(id, title, author, genres, null);
-        return bookRepository.save(book);
+        book.setTitle(title);
+        book.setAuthor(author);
+        book.setGenres(genres);
     }
 }

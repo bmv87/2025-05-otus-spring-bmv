@@ -36,6 +36,8 @@ class JpaCommentRepositoryTest {
         var actualComment = repositoryJpa.findById(expectedComment.getId());
         assertThat(actualComment).isPresent()
                 .get()
+                .usingRecursiveComparison()
+                .ignoringFields("book")
                 .isEqualTo(expectedComment);
     }
 
@@ -46,7 +48,8 @@ class JpaCommentRepositoryTest {
         var actualComments = repositoryJpa.findAllByBookId(book.getId());
         var expectedComments = getDbComments(book);
 
-        assertThat(actualComments).containsExactlyElementsOf(expectedComments);
+        assertThat(actualComments)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("book").containsExactlyElementsOf(expectedComments);
         actualComments.forEach(System.out::println);
     }
 
@@ -62,17 +65,21 @@ class JpaCommentRepositoryTest {
         assertThat(repositoryJpa.findById(returnedComment.getId()))
                 .isPresent()
                 .get()
+                .usingRecursiveComparison()
+                .ignoringFields("book")
                 .isEqualTo(returnedComment);
     }
 
     @DisplayName("должен сохранять измененный комментарий")
     @Test
     void shouldSaveUpdatedComment() {
-        var expectedComment = new Comment(1L, "content_1_3",  getDbBooks().get(0));
+        var expectedComment = new Comment(1L, "content_1_3", getDbBooks().get(0));
 
         assertThat(repositoryJpa.findById(expectedComment.getId()))
                 .isPresent()
                 .get()
+                .usingRecursiveComparison()
+                .ignoringFields("book")
                 .isNotEqualTo(expectedComment);
 
         var returnedComment = repositoryJpa.save(expectedComment);
@@ -83,17 +90,17 @@ class JpaCommentRepositoryTest {
         assertThat(repositoryJpa.findById(returnedComment.getId()))
                 .isPresent()
                 .get()
+                .usingRecursiveComparison()
+                .ignoringFields("book")
                 .isEqualTo(returnedComment);
     }
 
     @DisplayName("должен удалять комментарий по id ")
     @Test
     void shouldDeleteComment() {
-       var comment =repositoryJpa.findById(1L).orElse(null);
+        var comment = repositoryJpa.findById(1L).orElse(null);
         assertThat(comment).isNotNull();
         repositoryJpa.deleteById(1L);
-
-        em.detach(comment);
 
         assertThat(repositoryJpa.findById(1L)).isEmpty();
     }

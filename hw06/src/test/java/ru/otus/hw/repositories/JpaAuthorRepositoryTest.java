@@ -31,7 +31,9 @@ class JpaAuthorRepositoryTest {
     void shouldReturnAllAuthors() {
         var expectedAuthors = getDbAuthors();
         var actualAuthors = repositoryJpa.findAll();
-        assertThat(actualAuthors).isNotEmpty().containsExactlyElementsOf(expectedAuthors);
+        assertThat(actualAuthors).isNotEmpty()
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyElementsOf(expectedAuthors);
         actualAuthors.forEach(System.out::println);
     }
 
@@ -42,6 +44,7 @@ class JpaAuthorRepositoryTest {
         var actualBook = repositoryJpa.findById(expectedAuthor.getId());
         assertThat(actualBook).isPresent()
                 .get()
+                .usingRecursiveComparison()
                 .isEqualTo(expectedAuthor);
     }
 
