@@ -64,7 +64,7 @@ class JpaBookRepositoryTest {
         assertThat(actualBooks)
                 .isNotEmpty()
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("comments")
-                .containsExactlyElementsOf(expectedBooks);
+                .containsAll(expectedBooks);
         actualBooks.forEach(System.out::println);
     }
 

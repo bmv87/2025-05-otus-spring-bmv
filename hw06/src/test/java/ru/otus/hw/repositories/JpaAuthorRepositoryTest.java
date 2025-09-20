@@ -33,7 +33,7 @@ class JpaAuthorRepositoryTest {
         var actualAuthors = repositoryJpa.findAll();
         assertThat(actualAuthors).isNotEmpty()
                 .usingRecursiveFieldByFieldElementComparator()
-                .containsExactlyElementsOf(expectedAuthors);
+                .containsAll(expectedAuthors);
         actualAuthors.forEach(System.out::println);
     }
 

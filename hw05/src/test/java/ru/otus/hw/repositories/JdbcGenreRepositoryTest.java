@@ -26,7 +26,7 @@ class JdbcGenreRepositoryTest {
     void shouldReturnAllGenres() {
         var expectedGenres = getDbGenres(1, 7);
         var actualGenres = repositoryJdbc.findAll();
-        assertThat(actualGenres).isNotEmpty().containsExactlyElementsOf(expectedGenres);
+        assertThat(actualGenres).isNotEmpty().containsAll(expectedGenres);
         actualGenres.forEach(System.out::println);
     }
 

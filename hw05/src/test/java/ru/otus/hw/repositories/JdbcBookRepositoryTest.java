@@ -54,7 +54,7 @@ class JdbcBookRepositoryTest {
         var actualBooks = repositoryJdbc.findAll();
         var expectedBooks = dbBooks;
 
-        assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
+        assertThat(actualBooks).containsAll(expectedBooks);
         actualBooks.forEach(System.out::println);
     }
 

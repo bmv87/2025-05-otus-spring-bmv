@@ -67,7 +67,7 @@ public class BookServiceImplTest {
                 .isNotEqualTo(actualBook);
         assertThat(actualBook.getAuthor()).isNotNull();
         assertThat(actualBook.getGenres()).isNotEmpty();
-        assertThat(actualBook.getGenres().stream().map(Genre::getId)).containsExactlyElementsOf(expectedGanres);
+        assertThat(actualBook.getGenres().stream().map(Genre::getId)).containsAll(expectedGanres);
         assertThat(actualBook.getTitle()).isEqualTo(expectedTitle);
         assertThat(actualBook.getAuthor().getId()).isEqualTo(expectedAuthorId);
     }

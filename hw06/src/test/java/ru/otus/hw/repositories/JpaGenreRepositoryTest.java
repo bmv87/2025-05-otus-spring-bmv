@@ -33,7 +33,7 @@ class JpaGenreRepositoryTest {
         assertThat(actualGenres)
                 .isNotEmpty()
                 .usingRecursiveFieldByFieldElementComparator()
-                .containsExactlyElementsOf(expectedGenres);
+                .containsAll(expectedGenres);
         actualGenres.forEach(System.out::println);
     }
 

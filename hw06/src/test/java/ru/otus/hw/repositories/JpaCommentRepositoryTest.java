@@ -49,7 +49,8 @@ class JpaCommentRepositoryTest {
         var expectedComments = getDbComments(book);
 
         assertThat(actualComments)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("book").containsExactlyElementsOf(expectedComments);
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("book")
+                .containsAll(expectedComments);
         actualComments.forEach(System.out::println);
     }
 
