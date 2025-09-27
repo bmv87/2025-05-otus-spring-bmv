@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.models.Author;
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Сервис для работы с книгами")
 @SpringBootTest()
 @Transactional(propagation = Propagation.NEVER)
+@ComponentScan({"ru.otus.hw", "ru.otus.hw.repositories"})
 public class BookServiceImplTest {
 
     @Autowired
