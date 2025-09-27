@@ -26,13 +26,24 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
+    @Transactional
     public Optional<Book> findById(long id) {
-        return bookRepository.findById(id);
+        var book = bookRepository.findById(id);
+        if (book.isPresent()) {
+            book.get().getGenres().size();
+            book.get().getComments().size();
+        }
+        return book;
     }
 
     @Override
+    @Transactional
     public List<Book> findAll() {
-        return bookRepository.findAll();
+        var books = bookRepository.findAll();
+        books.forEach(b -> {
+            b.getGenres().size();
+        });
+        return books;
     }
 
     @Override

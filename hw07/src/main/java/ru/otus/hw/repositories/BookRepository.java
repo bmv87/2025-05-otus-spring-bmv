@@ -1,6 +1,5 @@
 package ru.otus.hw.repositories;
 
-import jakarta.annotation.Nonnull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.otus.hw.models.Book;
@@ -10,11 +9,11 @@ import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    @EntityGraph(attributePaths = {"author", "genres"})
-    Optional<Book> findById(long id);
+    @Override
+    @EntityGraph(value = "books-authors-genres-entity-graph")
+    Optional<Book> findById(Long id);
 
-    @Nonnull
-    @EntityGraph(attributePaths = {"author", "genres"})
+    @EntityGraph(value = "books-authors-entity-graph")
     List<Book> findAll();
 }
 
