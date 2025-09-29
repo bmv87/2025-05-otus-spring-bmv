@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -19,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис для работы с книгами")
 @SpringBootTest()
-@Transactional(propagation = Propagation.NEVER)
 @ComponentScan({"ru.otus.hw", "ru.otus.hw.repositories"})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class BookServiceImplTest {
 
     @Autowired
@@ -30,13 +29,12 @@ public class BookServiceImplTest {
     @Test
     void shouldFindAllBooks() {
         var expectedBooks = getDbBooks();
-        // ?? test fail for containsAll validation if other test change data
         List<Book> books = bookService.findAll();
         assertThat(books)
-                .isNotEmpty();
-//                .hasSize(3)
-//                .usingRecursiveFieldByFieldElementComparator()
-//                .containsAll(expectedBooks);
+                .isNotEmpty()
+                .hasSize(3)
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsAll(expectedBooks);
     }
 
     @DisplayName("Создать книгу")

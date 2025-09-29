@@ -2,7 +2,6 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Comment;
@@ -31,7 +30,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional
     public Comment insert(long bookId, String content) {
         if (bookId == 0L) {
             throw new IllegalArgumentException("Book id not valid");
@@ -45,7 +43,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional
     public Comment update(long id, String content) {
         if (id == 0L) {
             throw new IllegalArgumentException("Comment id not valid");
@@ -59,7 +56,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional
     public void deleteById(long id) {
         commentRepository.deleteById(id);
     }
