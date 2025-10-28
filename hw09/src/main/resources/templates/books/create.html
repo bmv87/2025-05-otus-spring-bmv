@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../../static/styles/book.css" th:href="@{/styles/book.css}" rel="stylesheet"/>
+</head>
+<body>
+<h1>Create book form</h1>
+<form class="book-form" action="#" th:action="@{/books/create}" th:object="${book}" method="post">
+    <div class="form-field">
+        <label for="bookTitle">Title</label>
+        <input id="bookTitle" type="text" th:field="*{title}"/>
+    </div>
+    <div class="form-field">
+        <label for="authorDropDownList">Author</label>
+        <select th:field="*{author}" class="form-control" id="authorDropDownList">
+            <option value="">Select author</option>
+            <option th:each="option : ${authors}" th:value="${option.id}" th:text="${option.name}"></option>
+        </select>
+    </div>
+    <div class="form-field">
+        <label for="genresDropDownList">Genres</label>
+        <select th:field="*{genres}" class="form-control" id="genresDropDownList" multiple="multiple">
+            <option th:each="option : ${genres}" th:value="${option.id}" th:text="${option.name}"></option>
+        </select>
+    </div>
+    <p><input type="submit" value="Submit"/></p>
+    <p><a class="btn btn-primary" th:href="@{'/books'}" href="list.html">Back</a></p>
+    <div th:replace="fragments/error :: error-block">Error</div>
+</form>
+</body>
+</html>

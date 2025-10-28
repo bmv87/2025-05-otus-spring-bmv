@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  padding: 50px;
+}
+table {
+  border-collapse: collapse;
+}
+tr td, tr th {
+  padding: 5px;
+  border: 2px solid #8c97a9;
+}
+
+label {
+  display: block;
+  margin-top: 1em;
+}
+
+input,
+select {
+  width: 100%;
+}
+
+input:invalid {
+  background-color: lightpink;
+}
+
+p {
+  display: flex;
+  gap: 10px;
+}
+
+.book {
+  border-collapse: collapse;
+}
+
+.book td:last-child, .book th:last-child {
+  width: 150px;
+}
+.book td:first-child, .book th:first-child {
+  width: 50px;
+}
+.btn-form {
+  display: inline-block;
+}
+.comments .actions a.btn, .comments .actions button.btn {
+  font-size: x-small;
+  display: flex;
+  height: auto;
+}
+.comments .actions button.btn, .books .actions button.btn {
+  width: 105px;
+}
+
+.book caption.actions a.btn, .book caption.actions button.btn {
+  width: 100px;
+}
+.book caption.actions {
+  display: flex;
+  flex-direction: row;
+  caption-side: bottom;
+}
+.btn {
+  border-radius: 8px;
+  border: 2px solid #fff;
+  margin: 5px;
+  padding: 5px 5px;
+  text-transform: uppercase;
+  justify-content: center;
+}
+button.btn {
+
+}
+a.btn {
+   text-decoration: none;
+   display: flex;
+   width: 105px;
+}
+
+.menu a.btn {
+   width: 120px;
+}
+.menu a.btn {
+   width: 125px;
+}
+.btn-primary {
+  color: #fff;
+  background-color: #70a7ff;
+}
+
+.btn-warn {
+  color: #fff;
+  background-color: #fe9770;
+}
+
+.books, .comments {
+  width: 500px;
+  border-collapse: collapse;
+}
+.genres, .authors {
+  width: 300px;
+  border-collapse: collapse;
+}
+
+.books td:first-child, .comments td:first-child {
+  width: 50px;
+}
+
+.book-form {
+  width: 250px;
+}
+
+.book-form .form-field {
+  width: inherit;
+}
+
+.error {
+  color: red;
+  display: block;
+}

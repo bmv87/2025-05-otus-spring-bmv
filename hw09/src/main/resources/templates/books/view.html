@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Library</title>
+    <link href="../../static/styles/book.css" th:href="@{/styles/book.css}" rel="stylesheet"/>
+</head>
+<body>
+<h2>Book card</h2>
+<div th:if="${book != null}">
+    <table class="book" th:object="${book}">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Id</td>
+                <td th:text="*{id}">1</td>
+            </tr>
+            <tr>
+                <td>Title</td>
+                <td th:text="*{title}">Book title</td>
+            </tr>
+            <tr>
+                <td>Author</td>
+                <td th:text="*{author.name}">Book author</td>
+            </tr>
+            <tr>
+                <td>Genres</td>
+                <td>
+                    <p th:each="genre : *{genres}" th:text="${genre.name}">
+                        genre
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+        <caption class="actions">
+            <a class="btn btn-primary" th:href="@{'/books'}" href="list.html">List</a>
+            <a class="btn btn-primary" th:href="@{'/books/edit/{id}'(id=*{id})}" href="edit.html">Edit</a>
+            <form id="book-form" class="btn-form" action="#" th:action="@{'/books/{id}'(id=*{id})}" th:method="delete">
+                <button class="btn btn-warn" type="submit" id="deleteBookButton">Delete</button>
+            </form>
+        </caption>
+    </table>
+
+    <h4>Comments</h4>
+    <table class="comments">
+        <caption class="actions">
+            <a class="btn btn-primary" th:href="@{'/comments/create'(bookId=${book.id})}" href="../comments/create.html">Create</a>
+       </caption>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Content</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="comment : ${book.comments}" th:object="${comment}">
+            <td th:text="*{id}">1</td>
+            <td th:text="*{content}">Content</td>
+            <td class="actions">
+                <a class="btn btn-primary" th:href="@{'/comments/edit/{id}'(id=*{id})}" href="../comments/edit.html">Edit</a>
+                <form id="comment-form" th:id="@{'comment-form-{id}'(id=*{id})}" class="btn-form" action="#"
+                      th:action="@{'/comments/{id}'(id=*{id})}" th:method="delete">
+                    <input type="hidden" name="bookId" th:value="${book.id}">
+                    <button class="btn btn-warn" type="submit" id="deleteCommentButton">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
