@@ -16,7 +16,6 @@ import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookEditDto;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
@@ -56,7 +55,7 @@ public class BooksController {
 
     @GetMapping("/books/create")
     public String insertBook(Model model) {
-        model.addAttribute("book", new Book());
+        model.addAttribute("book", new BookDto());
         addDictionariesToModel(model);
         return "books/create";
     }
@@ -102,7 +101,7 @@ public class BooksController {
     @DeleteMapping("/books/{id}")
     public String deleteBook(@PathVariable long id) {
         bookService.deleteById(id);
-        return "redirect:/books/";
+        return "redirect:/books";
     }
 
     private void addDictionariesToModel(Model model) {
