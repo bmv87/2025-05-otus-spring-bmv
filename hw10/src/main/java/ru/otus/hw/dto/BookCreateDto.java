@@ -24,5 +24,5 @@ public class BookCreateDto {
     private Long author;
 
     @NotEmpty
-    private Set<Long> genres = new HashSet<>();
+    private Set<@NotNull Long> genres = new HashSet<>();
 }

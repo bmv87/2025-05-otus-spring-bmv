@@ -10,10 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import ru.otus.hw.converters.AuthorConverter;
-import ru.otus.hw.converters.BookConverter;
-import ru.otus.hw.converters.CommentConverter;
-import ru.otus.hw.converters.GenreConverter;
+import ru.otus.hw.mappers.AuthorMapper;
+import ru.otus.hw.mappers.BookMapper;
+import ru.otus.hw.mappers.CommentMapper;
+import ru.otus.hw.mappers.GenreMapper;
 import ru.otus.hw.dto.BookCreateDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookViewDto;
@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BooksController.class)
-@Import({GenreConverter.class, AuthorConverter.class, BookConverter.class, CommentConverter.class})
+@Import({GenreMapper.class, AuthorMapper.class, BookMapper.class, CommentMapper.class})
 public class BooksControllerTest {
 
     @Autowired
@@ -58,13 +58,13 @@ public class BooksControllerTest {
     private ObjectMapper mapper;
 
     @Autowired
-    private BookConverter bookConverter;
+    private BookMapper bookMapper;
 
     @Autowired
-    private AuthorConverter authorConverter;
+    private AuthorMapper authorMapper;
 
     @Autowired
-    private GenreConverter genreConverter;
+    private GenreMapper genreMapper;
 
     @MockitoBean
     private BookService bookService;
@@ -95,7 +95,7 @@ public class BooksControllerTest {
         when(bookService.findAll()).thenReturn(dbBooks);
         List<BookDto> expectedBooks = dbBooks
                 .stream()
-                .map(bookConverter::toListItemDto)
+                .map(bookMapper::toListItemDto)
                 .toList();
         mvc.perform(get("/api/v1/books").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ public class BooksControllerTest {
     void shouldReturnBookDtoWithCorrectContentType() throws Exception {
         var book = dbBooks.get(0);
         when(bookService.findById(1L)).thenReturn(book);
-        BookViewDto expectedBook = bookConverter.toBookViewDto(book);
+        BookViewDto expectedBook = bookMapper.toBookViewDto(book);
         mvc.perform(get("/api/v1/books/{id}", String.valueOf(book.getId())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -129,7 +129,7 @@ public class BooksControllerTest {
     @Test
     void shouldUpdateBookAndAndReturnBookDtoWithCorrectContentType() throws Exception {
         var book = dbBooks.get(0);
-        var bookEditDto = bookConverter.toUpdateDto(dbBooks.get(0));
+        var bookEditDto = bookMapper.toUpdateDto(dbBooks.get(0));
         when(bookService.update(
                 anyLong(),
                 anyString(),
@@ -147,7 +147,7 @@ public class BooksControllerTest {
     @Test
     void shouldReturnErrorDtoWithCorrectStatusForIncorrectUpdateBookDto() throws Exception {
         var book = dbBooks.get(0);
-        var incorrectBook = bookConverter.toUpdateDto(dbBooks.get(0));
+        var incorrectBook = bookMapper.toUpdateDto(dbBooks.get(0));
         incorrectBook.setTitle(null);
         var expectedErrorDto = new ErrorDto(
                 "400",
@@ -178,7 +178,7 @@ public class BooksControllerTest {
     @Test
     void shouldCreateBookAndReturnBookDtoWithCorrectContentType() throws Exception {
         var book = dbBooks.get(0);
-        var bookEditDto = bookConverter.toUpdateDto(dbBooks.get(0));
+        var bookEditDto = bookMapper.toUpdateDto(dbBooks.get(0));
         when(bookService.insert(anyString(), anyLong(), any())).thenReturn(book);
         var genres = book.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
         BookCreateDto expectedBook = new BookCreateDto(book.getTitle(), book.getAuthor().getId(), genres);

@@ -1,7 +1,6 @@
 package ru.otus.hw.config;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +32,7 @@ public class ApiConfiguration implements WebMvcConfigurer {
 
 
     @Bean
-    @SneakyThrows
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .httpBasic(config -> {
                 })

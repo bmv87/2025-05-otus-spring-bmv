@@ -1,4 +1,4 @@
-package ru.otus.hw.converters;
+package ru.otus.hw.mappers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,19 +12,19 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
-public class BookConverter {
-    private final AuthorConverter authorConverter;
+public class BookMapper {
+    private final AuthorMapper authorMapper;
 
-    private final GenreConverter genreConverter;
+    private final GenreMapper genreMapper;
 
-    private final CommentConverter commentConverter;
+    private final CommentMapper commentMapper;
 
     public BookDto toListItemDto(Book book) {
-        var genresDtoList = book.getGenres().stream().map(genreConverter::toViewDto).toList();
+        var genresDtoList = book.getGenres().stream().map(genreMapper::toViewDto).toList();
         return new BookDto(
                 book.getId(),
                 book.getTitle(),
-                authorConverter.toViewDto(book.getAuthor()),
+                authorMapper.toViewDto(book.getAuthor()),
                 genresDtoList);
     }
 
@@ -40,13 +40,13 @@ public class BookConverter {
     public BookViewDto toBookViewDto(Book book) {
         var genresDtoList = book.getGenres()
                 .stream()
-                .map(genreConverter::toViewDto)
+                .map(genreMapper::toViewDto)
                 .toList();
 
         return new BookViewDto(
                 book.getId(),
                 book.getTitle(),
-                authorConverter.toViewDto(book.getAuthor()),
+                authorMapper.toViewDto(book.getAuthor()),
                 genresDtoList
         );
     }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.otus.hw.converters.BookConverter;
+import ru.otus.hw.mappers.BookMapper;
 import ru.otus.hw.dto.BookCreateDto;
 import ru.otus.hw.dto.BookUpdateDto;
 import ru.otus.hw.dto.BookDto;
@@ -26,12 +26,12 @@ public class BooksController {
 
     private final BookService bookService;
 
-    private final BookConverter bookConverter;
+    private final BookMapper bookMapper;
 
     @GetMapping()
     public List<BookDto> findAllBooks() {
         var books = bookService.findAll().stream()
-                .map(bookConverter::toListItemDto)
+                .map(bookMapper::toListItemDto)
                 .toList();
         return books;
     }
@@ -39,14 +39,14 @@ public class BooksController {
     @GetMapping("/{id}")
     public BookViewDto findBookById(@PathVariable("id") long id) {
         var book = bookService.findById(id);
-        var bookDto = bookConverter.toBookViewDto(book);
+        var bookDto = bookMapper.toBookViewDto(book);
         return bookDto;
     }
 
     @PostMapping()
     public BookUpdateDto insertBook(@Valid @RequestBody BookCreateDto newBook) {
         var book = bookService.insert(newBook.getTitle(), newBook.getAuthor(), newBook.getGenres());
-        return bookConverter.toUpdateDto(book);
+        return bookMapper.toUpdateDto(book);
     }
 
     @PutMapping("/{id}")
@@ -57,7 +57,7 @@ public class BooksController {
                 editedBook.getTitle(),
                 editedBook.getAuthor(),
                 editedBook.getGenres());
-        var bookDto = bookConverter.toUpdateDto(book);
+        var bookDto = bookMapper.toUpdateDto(book);
         return bookDto;
     }
 
