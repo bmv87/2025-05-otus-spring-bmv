@@ -1,30 +1,25 @@
 package ru.otus.hw.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.otus.hw.InMemoryUserDetailsManagerConfiguration;
-import ru.otus.hw.models.UserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.DataGenerator;
+import ru.otus.hw.InMemoryUserDetailsManagerConfiguration;
 import ru.otus.hw.config.SecurityConfig;
 import ru.otus.hw.converters.AuthorConverter;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.UserInfo;
 import ru.otus.hw.services.BookService;
 
 import java.util.List;
@@ -69,7 +64,7 @@ public class BookControllerAccessTest {
         dbBooks = DataGenerator.getDbBooks(dbAuthors, dbGenres);
     }
 
-      @Test
+    @Test
     @WithMockUser(username = "reader", roles = {READER})
     void postForReaderFailWith403() throws Exception {
         mvc.perform(post("/api/v1/books"))

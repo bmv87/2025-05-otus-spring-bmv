@@ -25,7 +25,6 @@ public class BookUpdateDto {
     @NotNull
     private Long author;
 
-    @NotNull
     @NotEmpty
-    private Set<Long> genres = new HashSet<>();
+    private Set<@NotNull Long> genres = new HashSet<>();
 }

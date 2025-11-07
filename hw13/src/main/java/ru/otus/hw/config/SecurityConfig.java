@@ -2,7 +2,6 @@ package ru.otus.hw.config;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,8 +35,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @SneakyThrows
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(config -> {
@@ -48,7 +46,6 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler()))
                 .authorizeHttpRequests(config -> {
                     config
-                            .requestMatchers(HttpMethod.OPTIONS, "/api/v1/**").permitAll()
                             .requestMatchers(HttpMethod.PUT, "/api/v1/books/**").hasAnyRole(ADMIN, AUTHOR)
                             .requestMatchers(HttpMethod.POST, "/api/v1/books/**").hasAnyRole(ADMIN, AUTHOR)
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasAnyRole(ADMIN, AUTHOR)
@@ -56,7 +53,6 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").hasAnyRole(ADMIN, AUTHOR, READER)
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").hasAnyRole(ADMIN, AUTHOR, READER)
                             .requestMatchers(HttpMethod.GET, "/api/v1/**").authenticated()
-                            .requestMatchers("/**").anonymous()
                             .anyRequest().authenticated();
                 })
                 .authenticationProvider(authenticationProvider())
