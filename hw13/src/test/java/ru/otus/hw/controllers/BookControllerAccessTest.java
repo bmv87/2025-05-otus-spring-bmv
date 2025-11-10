@@ -15,9 +15,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.DataGenerator;
 import ru.otus.hw.InMemoryUserDetailsManagerConfiguration;
 import ru.otus.hw.config.SecurityConfig;
-import ru.otus.hw.converters.AuthorConverter;
-import ru.otus.hw.converters.BookConverter;
-import ru.otus.hw.converters.GenreConverter;
+import ru.otus.hw.mappers.AuthorMapper;
+import ru.otus.hw.mappers.BookMapper;
+import ru.otus.hw.mappers.GenreMapper;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.UserInfo;
 import ru.otus.hw.services.BookService;
@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -40,7 +39,7 @@ import static ru.otus.hw.security.AuthorityConstants.AUTHOR;
 import static ru.otus.hw.security.AuthorityConstants.READER;
 
 @WebMvcTest(BooksController.class)
-@Import({GenreConverter.class, AuthorConverter.class, BookConverter.class, SecurityConfig.class, InMemoryUserDetailsManagerConfiguration.class})
+@Import({GenreMapper.class, AuthorMapper.class, BookMapper.class, SecurityConfig.class, InMemoryUserDetailsManagerConfiguration.class})
 public class BookControllerAccessTest {
 
     @Autowired
@@ -53,7 +52,7 @@ public class BookControllerAccessTest {
     private BookService bookService;
 
     @Autowired
-    private BookConverter bookConverter;
+    private BookMapper bookMapper;
 
     private List<Book> dbBooks;
 
@@ -89,14 +88,13 @@ public class BookControllerAccessTest {
     @WithMockUser(username = "author", roles = {AUTHOR})
     void putForAuthorIsOk() throws Exception {
         var book = dbBooks.get(0);
-        var bookEditDto = bookConverter.toUpdateDto(dbBooks.get(0));
+        var bookEditDto = bookMapper.toUpdateDto(book);
+        var bookViewDto = bookMapper.toBookViewDto(book);
         when(bookService.update(
                 anyLong(),
-                anyString(),
-                anyLong(),
-                any())).thenReturn(book);
+                any())).thenReturn(bookViewDto);
 
-        mvc.perform(put("/api/v1/books/{id}", String.valueOf(bookEditDto.getId()))
+        mvc.perform(put("/api/v1/books/{id}", String.valueOf(book.getId()))
                         .content(mapper.writeValueAsString(bookEditDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -105,7 +103,8 @@ public class BookControllerAccessTest {
     @ParameterizedTest()
     @MethodSource("getUsers")
     void shouldReturnOkForAthenticated(UserInfo user) throws Exception {
-        when(bookService.findAll()).thenReturn(dbBooks);
+        var books = List.of(bookMapper.toListItemDto(dbBooks.get(0)));
+        when(bookService.findAll()).thenReturn(books);
         mvc.perform(get("/api/v1/books")
                         .with(httpBasic(user.getUsername(), user.getPassword())))
                 .andExpect(status().isOk())

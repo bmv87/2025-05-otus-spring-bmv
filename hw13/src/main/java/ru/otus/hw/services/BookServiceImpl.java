@@ -6,7 +6,11 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.dto.BookCreateDto;
+import ru.otus.hw.dto.BookDto;
+import ru.otus.hw.dto.BookViewDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.BookMapper;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
@@ -22,6 +26,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @RequiredArgsConstructor
 @Service
 public class BookServiceImpl implements BookService {
+
+    private final BookMapper bookMapper;
 
     private final AuthorRepository authorRepository;
 
@@ -39,45 +45,44 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public Book findById(long id) {
+    public BookViewDto findById(long id) {
         var book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
-        book.getGenres().size();
-        book.getComments().size();
-
-        return book;
+        return bookMapper.toBookViewDto(book);
     }
 
     @Override
     @Transactional
-    public List<Book> findAll() {
-        var books = bookRepository.findAll();
-        books.forEach(b -> {
-            b.getGenres().size();
-        });
+    public List<BookDto> findAll() {
+        var books = bookRepository.findAll()
+                .stream()
+                .map(bookMapper::toListItemDto)
+                .toList();
         return books;
     }
 
     @Override
     @Transactional
-    public Book insert(String title, long authorId, Set<Long> genresIds) {
-        var newBook = new Book();
-        newBook.setId(0);
-        validateAndFill(newBook, title, authorId, genresIds);
-        newBook = bookRepository.save(newBook);
-        aclServiceWrapperService.createPermission(newBook, getPermissionConfig());
-        return newBook;
+    public BookViewDto insert(BookCreateDto bookDto) {
+        var book = new Book();
+        book.setId(0);
+        validateAndFill(book, bookDto.getTitle(), bookDto.getAuthor(), bookDto.getGenres());
+        book = bookRepository.save(book);
+        aclServiceWrapperService.createPermission(book, getPermissionConfig());
+        return bookMapper.toBookViewDto(book);
     }
 
     @Override
     @Transactional
     @PreAuthorize("canWrite(#id, T(ru.otus.hw.models.Book))")
-    public Book update(long id, String title, long authorId, Set<Long> genresIds) {
+    public BookViewDto update(long id, BookCreateDto bookDto) {
         var book = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Book with id %d not found".formatted(id)));
 
-        validateAndFill(book, title, authorId, genresIds);
-        return bookRepository.save(book);
+        validateAndFill(book, bookDto.getTitle(), bookDto.getAuthor(), bookDto.getGenres());
+        book = bookRepository.save(book);
+        return bookMapper.toBookViewDto(book);
     }
 
     @Override

@@ -52,7 +52,6 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.PUT, "/api/v1/comments/**").hasAnyRole(ADMIN, AUTHOR, READER)
                             .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").hasAnyRole(ADMIN, AUTHOR, READER)
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").hasAnyRole(ADMIN, AUTHOR, READER)
-                            .requestMatchers(HttpMethod.GET, "/api/v1/**").authenticated()
                             .anyRequest().authenticated();
                 })
                 .authenticationProvider(authenticationProvider())

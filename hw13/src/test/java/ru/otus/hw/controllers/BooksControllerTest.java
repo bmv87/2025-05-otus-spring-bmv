@@ -15,15 +15,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import ru.otus.hw.DataGenerator;
 import ru.otus.hw.InMemoryUserDetailsManagerConfiguration;
 import ru.otus.hw.config.SecurityConfig;
-import ru.otus.hw.converters.AuthorConverter;
-import ru.otus.hw.converters.BookConverter;
-import ru.otus.hw.converters.GenreConverter;
-import ru.otus.hw.dto.BookCreateDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookViewDto;
 import ru.otus.hw.dto.ErrorDto;
 import ru.otus.hw.dto.FieldErrorDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.AuthorMapper;
+import ru.otus.hw.mappers.BookMapper;
+import ru.otus.hw.mappers.GenreMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -32,13 +31,11 @@ import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.otus.hw.security.AuthorityConstants.ADMIN;
 
 @WebMvcTest(BooksController.class)
-@Import({GenreConverter.class, AuthorConverter.class, BookConverter.class, SecurityConfig.class, InMemoryUserDetailsManagerConfiguration.class})
+@Import({GenreMapper.class, AuthorMapper.class, BookMapper.class, SecurityConfig.class, InMemoryUserDetailsManagerConfiguration.class})
 public class BooksControllerTest {
 
     @Autowired
@@ -62,13 +59,13 @@ public class BooksControllerTest {
     private ObjectMapper mapper;
 
     @Autowired
-    private BookConverter bookConverter;
+    private BookMapper bookMapper;
 
     @Autowired
-    private AuthorConverter authorConverter;
+    private AuthorMapper authorMapper;
 
     @Autowired
-    private GenreConverter genreConverter;
+    private GenreMapper genreMapper;
 
     @MockitoBean
     private BookService bookService;
@@ -97,11 +94,12 @@ public class BooksControllerTest {
     @Test
     @WithMockUser
     void shouldReturnBookDtoArrayWithCorrectContentType() throws Exception {
-        when(bookService.findAll()).thenReturn(dbBooks);
         List<BookDto> expectedBooks = dbBooks
                 .stream()
-                .map(bookConverter::toListItemDto)
+                .map(bookMapper::toListItemDto)
                 .toList();
+        when(bookService.findAll()).thenReturn(expectedBooks);
+
         mvc.perform(get("/api/v1/books").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -113,8 +111,9 @@ public class BooksControllerTest {
     @WithMockUser
     void shouldReturnBookDtoWithCorrectContentType() throws Exception {
         var book = dbBooks.get(0);
-        when(bookService.findById(1L)).thenReturn(book);
-        BookViewDto expectedBook = bookConverter.toBookViewDto(book);
+        BookViewDto expectedBook = bookMapper.toBookViewDto(book);
+        when(bookService.findById(1L)).thenReturn(expectedBook);
+
         mvc.perform(get("/api/v1/books/{id}", String.valueOf(book.getId())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -139,19 +138,18 @@ public class BooksControllerTest {
     @WithMockUser(username = "admin", roles = {ADMIN})
     void shouldUpdateBookAndReturnBookDtoWithCorrectContentType() throws Exception {
         var book = dbBooks.get(0);
-        var bookEditDto = bookConverter.toUpdateDto(dbBooks.get(0));
+        var bookEditDto = bookMapper.toUpdateDto(book);
+        var bookViewDto = bookMapper.toBookViewDto(book);
         when(bookService.update(
                 anyLong(),
-                anyString(),
-                anyLong(),
-                any())).thenReturn(book);
+                any())).thenReturn(bookViewDto);
 
-        mvc.perform(put("/api/v1/books/{id}", String.valueOf(bookEditDto.getId()))
+        mvc.perform(put("/api/v1/books/{id}", String.valueOf(book.getId()))
                         .content(mapper.writeValueAsString(bookEditDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapper.writeValueAsString(bookEditDto)));
+                .andExpect(content().json(mapper.writeValueAsString(bookViewDto)));
     }
 
     @DisplayName("При обновлении книги с неправильным набором параметров получаем ожидаемый ответ и статус 400.")
@@ -159,21 +157,15 @@ public class BooksControllerTest {
     @WithMockUser(username = "admin", roles = {ADMIN})
     void shouldReturnErrorDtoWithCorrectStatusForIncorrectUpdateBookDto() throws Exception {
         var book = dbBooks.get(0);
-        var incorrectBook = bookConverter.toUpdateDto(dbBooks.get(0));
+        var incorrectBook = bookMapper.toUpdateDto(dbBooks.get(0));
         incorrectBook.setTitle(null);
         var expectedErrorDto = new ErrorDto(
                 "400",
                 "Validation error",
                 List.of(new FieldErrorDto("title", "must not be blank")));
 
-        when(bookService.update(
-                anyLong(),
-                anyString(),
-                anyLong(),
-                any())).thenReturn(book);
-
         MvcResult mvcResult = mvc.perform(put("/api/v1/books/{id}",
-                        String.valueOf(incorrectBook.getId()))
+                        String.valueOf(book.getId()))
                         .content(mapper.writeValueAsString(incorrectBook))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -192,20 +184,19 @@ public class BooksControllerTest {
     @WithMockUser(username = "admin", roles = {ADMIN})
     void shouldCreateBookAndReturnBookDtoWithCorrectContentType() throws Exception {
         var book = dbBooks.get(0);
-        var bookEditDto = bookConverter.toUpdateDto(dbBooks.get(0));
-        when(bookService.insert(anyString(), anyLong(), any())).thenReturn(book);
-        var genres = book.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
-        BookCreateDto expectedBook = new BookCreateDto(book.getTitle(), book.getAuthor().getId(), genres);
+        var createBookDto = bookMapper.toUpdateDto(book);
+        var bookViewDto = bookMapper.toBookViewDto(book);
+        when(bookService.insert(any())).thenReturn(bookViewDto);
 
         mvc.perform(post("/api/v1/books", String.valueOf(book.getId()))
-                        .content(mapper.writeValueAsString(expectedBook))
+                        .content(mapper.writeValueAsString(createBookDto))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapper.writeValueAsString(bookEditDto)));
+                .andExpect(content().json(mapper.writeValueAsString(bookViewDto)));
     }
 
-    @DisplayName("Можно удвлить книгу и получить статус 200.")
+    @DisplayName("Можно удалить книгу и получить статус 200.")
     @Test
     @WithMockUser(username = "admin", roles = {ADMIN})
     void shouldDeleteBook() throws Exception {

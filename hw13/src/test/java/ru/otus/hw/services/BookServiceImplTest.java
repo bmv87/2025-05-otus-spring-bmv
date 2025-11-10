@@ -8,7 +8,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.dto.BookCreateDto;
+import ru.otus.hw.dto.GenreViewDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.BookMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -29,17 +32,22 @@ import static ru.otus.hw.security.AuthorityConstants.ADMIN;
 public class BookServiceImplTest {
 
     @Autowired
+    private BookMapper bookMapper;
+
+    @Autowired
     private BookServiceImpl bookService;
 
     @DisplayName("Возвращать список всех книг")
     @Test
     void shouldFindAllBooks() {
         var actualBooks = bookService.findAll();
-        var expectedBooks = getDbBooks();
+        var expectedBooks = getDbBooks()
+                .stream()
+                .map(bookMapper::toListItemDto)
+                .toList();
 
         assertThat(actualBooks)
                 .isNotEmpty()
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("comments")
                 .containsAll(expectedBooks);
         actualBooks.forEach(System.out::println);
     }
@@ -50,13 +58,13 @@ public class BookServiceImplTest {
         var expectedTitle = "title_test";
         var expectedAuthorId = 1L;
         Set<Long> expectedGanres = Set.of(1L, 2L);
-
-        Book createdBook = bookService.insert(expectedTitle, expectedAuthorId, expectedGanres);
+        var createBookDto = new BookCreateDto(expectedTitle, expectedAuthorId, expectedGanres);
+        var createdBook = bookService.insert(createBookDto);
         var actualBook = bookService.findById(createdBook.getId());
         assertThat(actualBook).isNotNull();
         assertThat(actualBook.getAuthor()).isNotNull();
         assertThat(actualBook.getGenres()).isNotEmpty();
-        assertThat(actualBook.getGenres().stream().map(Genre::getId))
+        assertThat(actualBook.getGenres().stream().map(GenreViewDto::getId))
                 .containsAll(expectedGanres);
         assertThat(actualBook.getTitle()).isEqualTo(expectedTitle);
         assertThat(actualBook.getAuthor().getId()).isEqualTo(expectedAuthorId);
@@ -70,15 +78,16 @@ public class BookServiceImplTest {
         var expectedAuthorId = 1L;
         Set<Long> expectedGanres = Set.of(2L, 4L);
 
-        Book prevBook = bookService.findById(1L);
-        Book editedBook = bookService.update(prevBook.getId(), expectedTitle, expectedAuthorId, expectedGanres);
-        Book actualBook = bookService.findById(editedBook.getId());
-        assertThat(prevBook).usingRecursiveComparison()
-                .ignoringFields("comments")
+        var prevBook = bookService.findById(1L);
+        var bookEditDto = new BookCreateDto(expectedTitle, expectedAuthorId, expectedGanres);
+        var editedBook = bookService.update(prevBook.getId(), bookEditDto);
+        var actualBook = bookService.findById(editedBook.getId());
+        assertThat(prevBook)
+                .usingRecursiveComparison()
                 .isNotEqualTo(actualBook);
         assertThat(actualBook.getAuthor()).isNotNull();
         assertThat(actualBook.getGenres()).isNotEmpty();
-        assertThat(actualBook.getGenres().stream().map(Genre::getId)).containsAll(expectedGanres);
+        assertThat(actualBook.getGenres().stream().map(GenreViewDto::getId)).containsAll(expectedGanres);
         assertThat(actualBook.getTitle()).isEqualTo(expectedTitle);
         assertThat(actualBook.getAuthor().getId()).isEqualTo(expectedAuthorId);
     }
