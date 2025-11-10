@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Library</title>
+    <link href="../../static/styles/book.css" th:href="@{/styles/book.css}" rel="stylesheet"/>
+</head>
+<body>
+<h1 th:text="'Edit book #' + ${book.id}">Edit form</h1>
+<form class="book-form" action="#" th:action="@{'/books/edit'}" th:object="${book}" method="post">
+    <input type="hidden" name="_method" value="put">
+    <input type="hidden" name="id" th:value="*{id}">
+    <p class="form-field">
+        <label for="bookTitle">Title</label>
+        <input id="bookTitle" type="text" th:field="*{title}"/>
+    </p>
+    <p class="form-field">
+        <label for="authorDropDownList">Author</label>
+        <select th:field="*{author}" class="form-control" id="authorDropDownList">
+            <option th:each="option : ${authors}"
+                    th:value="${option.id}"
+                    th:text="${option.name}"
+                    th:selected="${book.author == option.id}"
+            ></option>
+        </select>
+    </p>
+    <p class="form-field">
+        <label for="genresDropDownList">Genres</label>
+        <select th:field="*{genres}" class="form-control" id="genresDropDownList" multiple="multiple">
+            <option th:each="option : ${genres}"
+                    th:value="${option.id}"
+                    th:text="${option.name}"
+                    th:selected="${#lists.contains(book.genres, option.id)}"
+            ></option>
+        </select>
+    </p>
+    <p><input type="submit" value="Submit"/></p>
+    <p><a class="btn btn-primary" th:href="@{'/books/view/{id}'(id=*{id})}" href="view.html">View</a></p>
+    <p><a class="btn btn-primary" th:href="@{'/books'}" href="list.html">List</a></p>
+    <div th:replace="fragments/error :: error-block">Error</div>
+</form>
+</body>
+</html>

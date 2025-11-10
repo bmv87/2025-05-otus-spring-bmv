@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Library</title>
+    <link href="../../static/styles/book.css" th:href="@{/styles/book.css}" rel="stylesheet"/>
+</head>
+<body>
+<h3>Books:</h3>
+<table class="books">
+    <caption class="actions">
+        <a class="btn btn-primary" th:href="@{/books/create}" href="create.html">Create</a>
+    </caption>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genres</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}" th:object="${book}">
+        <td th:text="*{id}">1</td>
+        <td th:text="*{title}">Book title</td>
+        <td th:text="*{author.name}">Book author</td>
+        <td>
+            <p th:each="genre : *{genres}" th:text="${genre.name}">
+                genre
+            </p>
+        </td>
+        <td class="actions">
+            <a class="btn btn-primary" th:href="@{'/books/edit/{id}'(id=*{id})}" href="edit.html">Edit</a>
+            <a class="btn btn-primary" th:href="@{'/books/view/{id}'(id=*{id})}" href="view.html">View</a>
+            <form class="btn-form" action="#" th:action="@{'/books/{id}'(id=*{id})}" th:method="delete">
+                <button class="btn btn-warn" type="submit" id="submitButton">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
