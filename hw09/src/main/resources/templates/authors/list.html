@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Library</title>
+    <link href="../../static/styles/book.css" th:href="@{/styles/book.css}" rel="stylesheet"/>
+</head>
+<body>
+<h3>Genres:</h3>
+<table class="authors">
+    <caption class="actions">
+        <a class="btn btn-primary" th:href="@{/menu}" href="../menu.html">Menu</a>
+    </caption>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="author : ${authors}" th:object="${author}">
+        <td th:text="*{id}">1</td>
+        <td th:text="*{name}">Author name</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

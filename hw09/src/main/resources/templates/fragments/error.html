@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Library</title>
+    <link href="../static/styles/book.css" th:href="@{/styles/book.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="error-block" th:fragment="error-block">
+    <ul>
+        <li th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? error : error">
+            <span th:text="${e.global}? '*' : ${e.fieldName}">The field name</span> |
+            <span th:text="${e.message}">The error message</span>
+        </li>
+    </ul>
+</div>
+<div class="error-block" th:fragment="error-empty">
+
+</div>
+</body>
+</html>
