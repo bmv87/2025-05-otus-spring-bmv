@@ -21,10 +21,6 @@ declare module 'vue-router/auto-routes' {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/[...page]': RouteRecordInfo<'/[...page]', '/:page(.*)', { page: ParamValue<true> }, { page: ParamValue<false> }>,
     '/authors/': RouteRecordInfo<'/authors/', '/authors', Record<never, never>, Record<never, never>>,
-    '/books/': RouteRecordInfo<'/books/', '/books', Record<never, never>, Record<never, never>>,
-    '/books/[id]': RouteRecordInfo<'/books/[id]', '/books/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/books/create': RouteRecordInfo<'/books/create', '/books/create', Record<never, never>, Record<never, never>>,
-    '/books/edit/[id]': RouteRecordInfo<'/books/edit/[id]', '/books/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/genres/': RouteRecordInfo<'/genres/', '/genres', Record<never, never>, Record<never, never>>,
   }
 
@@ -49,22 +45,6 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/authors/index.vue': {
       routes: '/authors/'
-      views: never
-    }
-    'src/pages/books/index.vue': {
-      routes: '/books/'
-      views: never
-    }
-    'src/pages/books/[id].vue': {
-      routes: '/books/[id]'
-      views: never
-    }
-    'src/pages/books/create.vue': {
-      routes: '/books/create'
-      views: never
-    }
-    'src/pages/books/edit/[id].vue': {
-      routes: '/books/edit/[id]'
       views: never
     }
     'src/pages/genres/index.vue': {

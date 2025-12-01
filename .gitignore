@@ -25,3 +25,6 @@ dependency-reduced-pom.xml
 /nbdist/
 /.nb-gradle/
 *.log.*.gz
+/**/node_modules/
+/**/dist/
+/**/node/
