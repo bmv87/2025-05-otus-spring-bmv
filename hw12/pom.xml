@@ -9,7 +9,7 @@
         <version>3.4.5</version>
         <relativePath/>
     </parent>
-    
+
     <groupId>ru.otus.hw</groupId>
     <artifactId>hw12-form-based-auth</artifactId>
 

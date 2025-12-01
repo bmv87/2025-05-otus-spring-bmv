@@ -12,9 +12,11 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    AuthDialog: typeof import('./src/components/AuthDialog.vue')['default']
     ConfirmDialog: typeof import('./src/components/ConfirmDialog.vue')['default']
     DialogSwitcher: typeof import('./src/components/DialogSwitcher.vue')['default']
     GeneralError: typeof import('./src/components/GeneralError.vue')['default']
+    GeneralErrorWrapper: typeof import('./src/components/GeneralErrorWrapper.vue')['default']
     Menu: typeof import('./src/components/Menu.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
