@@ -84,11 +84,13 @@ public class DatabaseChangelog {
     }
 
     private static List<MongoBook> getDbBooks(List<MongoAuthor> dbAuthors, List<MongoGenre> dbGenres) {
-        return IntStream.range(1, 4).boxed()
+        return IntStream.range(1, 10).boxed()
                 .map(id -> new MongoBook(Long.valueOf(id),
                         "BookTitle_" + id,
-                        dbAuthors.get(id - 1),
-                        dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
+                        dbAuthors.get(id <= dbAuthors.size() ? id - 1 : dbAuthors.size() - 1),
+                        dbGenres.subList(
+                                id <= dbGenres.size() ? (id - 1) : 0,
+                                (id + 1) <= dbGenres.size() ? (id + 1) : 5)
                 ))
                 .toList();
     }

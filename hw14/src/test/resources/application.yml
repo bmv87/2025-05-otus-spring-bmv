@@ -12,6 +12,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+
   batch:
     jdbc:
 #      switch to never if using not temp database https://runebook.dev/en/docs/spring_boot/application-properties/application-properties.integration.spring.batch.jdbc.schema

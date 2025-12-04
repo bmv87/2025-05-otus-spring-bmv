@@ -1,13 +1,15 @@
 package ru.otus.hw.repositories.relational;
 
+import jakarta.persistence.QueryHint;
+import org.hibernate.jpa.AvailableHints;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.QueryHints;
 import ru.otus.hw.entities.Genre;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface GenreRepository extends JpaRepository<Genre, Long> {
-    @Query(value = "SELECT g FROM Genre g WHERE g.name IN :names")
-    List<Genre> findAllByName(@Param("names") List<String> names);
+
+    @QueryHints(@QueryHint(name = AvailableHints.HINT_CACHEABLE, value = "true"))
+    Optional<Genre> findByNameIgnoreCase(String name);
 }

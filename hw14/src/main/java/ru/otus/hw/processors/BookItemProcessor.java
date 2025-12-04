@@ -34,24 +34,20 @@ public class BookItemProcessor implements ItemProcessor<MongoBook, Book> {
         return book;
     }
 
-
     private Author getOrInitAuthor(String name) {
-        Optional<Author> authorOptional = authorRepository.findByFullName(name);
+        Optional<Author> authorOptional = authorRepository.findByFullNameIgnoreCase(name.toUpperCase());
         return authorOptional.orElse(new Author(0, name));
     }
 
     private List<Genre> getOrInitGenres(List<String> names) {
-        var genres = genreRepository.findAllByName(names);
-        if (genres.size() != names.size()) {
-            genres = new ArrayList<>(genres);
-            for (var name : names) {
-                if (genres.stream().anyMatch(g -> g.getName().equalsIgnoreCase(name))) {
-                    continue;
-                }
+        var genres = new ArrayList<Genre>();
+        for (var name : names) {
+            var genre = genreRepository.findByNameIgnoreCase(name.toUpperCase());
+            if (genre.isEmpty()) {
                 genres.add(new Genre(0, name));
             }
-
         }
+
         return genres;
     }
 
