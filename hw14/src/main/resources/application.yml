@@ -18,27 +18,13 @@ spring:
     hibernate:
       ddl-auto: create-drop
     properties:
-      javax:
-        persistence:
-          sharedCache:
-            #required - enable selective caching mode - only entities with @Cacheable annotation will use L2 cache.
-            mode: ENABLE_SELECTIVE
       hibernate:
         #optional - enable SQL statements formatting.
 #       format_sql: true
-        #optional - generate statistics to check if L2/query cache is actually being used.
-        generate_statistics: true
-        cache:
-          uri: ehcache.xml
-          #required - turn on L2 cache.
-          use_second_level_cache: true
-          #optional - turn on query cache.
-          use_query_cache: true
-          region:
-            #required - classpath to cache region factory.
-            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
 
   batch:
+    job:
+      enabled: false
     jdbc:
 #      switch to never if using not temp database https://runebook.dev/en/docs/spring_boot/application-properties/application-properties.integration.spring.batch.jdbc.schema
       initialize-schema: always

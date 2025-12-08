@@ -5,23 +5,15 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 import ru.otus.hw.documents.MongoGenre;
 import ru.otus.hw.entities.Genre;
-import ru.otus.hw.repositories.relational.GenreRepository;
-
-import java.util.Optional;
+import ru.otus.hw.models.ItemBox;
 
 @Component
 @RequiredArgsConstructor
-public class GenreItemProcessor implements ItemProcessor<MongoGenre, Genre> {
-
-    private final GenreRepository genreRepository;
+public class GenreItemProcessor implements
+        ItemProcessor<MongoGenre, ItemBox<Genre, Long, Long>> {
 
     @Override
-    public Genre process(MongoGenre item) throws Exception {
-        return getOrInitGenre(item.getName());
-    }
-
-    private Genre getOrInitGenre(String name) {
-        Optional<Genre> authorOptional = genreRepository.findByNameIgnoreCase(name);
-        return authorOptional.orElse(new Genre(0, name));
+    public ItemBox<Genre, Long, Long> process(MongoGenre item) throws Exception {
+        return new ItemBox<>(item.getId(), new Genre(0L, item.getName()));
     }
 }

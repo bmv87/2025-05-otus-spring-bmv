@@ -5,23 +5,15 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 import ru.otus.hw.documents.MongoAuthor;
 import ru.otus.hw.entities.Author;
-import ru.otus.hw.repositories.relational.AuthorRepository;
-
-import java.util.Optional;
+import ru.otus.hw.models.ItemBox;
 
 @Component
 @RequiredArgsConstructor
-public class AuthorItemProcessor implements ItemProcessor<MongoAuthor, Author> {
-
-    private final AuthorRepository authorRepository;
+public class AuthorItemProcessor implements
+        ItemProcessor<MongoAuthor, ItemBox<Author, Long, Long>> {
 
     @Override
-    public Author process(MongoAuthor item) throws Exception {
-        return getOrInitAuthor(item.getFullName());
-    }
-
-    private Author getOrInitAuthor(String name) {
-        Optional<Author> authorOptional = authorRepository.findByFullNameIgnoreCase(name);
-        return authorOptional.orElse(new Author(0, name));
+    public ItemBox<Author, Long, Long> process(MongoAuthor item) throws Exception {
+        return new ItemBox<>(item.getId(), new Author(0L, item.getFullName()));
     }
 }

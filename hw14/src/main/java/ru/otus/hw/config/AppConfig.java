@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.PlatformTransactionManager;
+import ru.otus.hw.cache.CacheHelper;
 import ru.otus.hw.documents.MongoAuthor;
 import ru.otus.hw.documents.MongoBook;
 import ru.otus.hw.documents.MongoComment;
@@ -29,7 +30,10 @@ import ru.otus.hw.entities.Author;
 import ru.otus.hw.entities.Book;
 import ru.otus.hw.entities.Comment;
 import ru.otus.hw.entities.Genre;
+import ru.otus.hw.entities.ObjectId;
 import ru.otus.hw.events.JobExecutionLogListener;
+import ru.otus.hw.exceptions.NotFoundException;
+import ru.otus.hw.models.ItemBox;
 import ru.otus.hw.processors.AuthorItemProcessor;
 import ru.otus.hw.processors.BookItemProcessor;
 import ru.otus.hw.processors.CommentItemProcessor;
@@ -42,6 +46,7 @@ import ru.otus.hw.repositories.relational.AuthorRepository;
 import ru.otus.hw.repositories.relational.BookRepository;
 import ru.otus.hw.repositories.relational.CommentRepository;
 import ru.otus.hw.repositories.relational.GenreRepository;
+import writers.CustomRepositoryItemWriter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +59,8 @@ public class AppConfig {
     private static final int CHUNK_SIZE = 2;
 
     private final BookItemProcessor bookItemProcessor;
+
+    private final CacheHelper cacheHelper;
 
     private final AuthorItemProcessor authorItemProcessor;
 
@@ -83,15 +90,25 @@ public class AppConfig {
         return writer;
     }
 
-    private <I, O> Step buildStep(String name,
-                                  RepositoryItemReader<I> genreReader,
-                                  RepositoryItemWriter<O> genreWriter,
-                                  ItemProcessor<I, O> itemProcessor) {
+    private <T extends ObjectId<Long>, B extends ItemBox<T, Long, Long>>
+    CustomRepositoryItemWriter<T, B> writer(CrudRepository<T, Long> repository, String cacheName) {
+        var writer = new CustomRepositoryItemWriter<T, B>(cacheHelper, repository, cacheName);
+        return writer;
+    }
+
+
+    private <I, O extends ObjectId<Long>, B extends ItemBox<O, Long, Long>>
+    Step buildStep(String name,
+                   RepositoryItemReader<I> reader,
+                   CustomRepositoryItemWriter<O, B> writer,
+                   ItemProcessor<I, B> itemProcessor) {
         return new StepBuilder(name, jobRepository)
-                .<I, O>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(genreReader)
+                .<I, B>chunk(CHUNK_SIZE, platformTransactionManager)
+                .reader(reader)
                 .processor(itemProcessor)
-                .writer(genreWriter)
+                .writer(writer)
+                .faultTolerant()
+                .skip(NotFoundException.class)
                 .startLimit(1)
                 .build();
     }
@@ -117,18 +134,18 @@ public class AppConfig {
     }
 
     @Bean
-    public RepositoryItemWriter<Author> authorWriter(AuthorRepository repository) {
-        return writer(repository);
+    public CustomRepositoryItemWriter<Author, ItemBox<Author, Long, Long>> authorWriter(AuthorRepository repository) {
+        return writer(repository, CacheHelper.AUTHORS);
     }
 
     @Bean
-    public RepositoryItemWriter<Genre> genreWriter(GenreRepository repository) {
-        return writer(repository);
+    public CustomRepositoryItemWriter<Genre, ItemBox<Genre, Long, Long>> genreWriter(GenreRepository repository) {
+        return writer(repository, CacheHelper.GENRES);
     }
 
     @Bean
-    public RepositoryItemWriter<Book> bookWriter(BookRepository repository) {
-        return writer(repository);
+    public CustomRepositoryItemWriter<Book, ItemBox<Book, Long, Long>> bookWriter(BookRepository repository) {
+        return writer(repository, CacheHelper.BOOKS);
     }
 
     @Bean
@@ -159,26 +176,34 @@ public class AppConfig {
 
     @Bean
     public Step authorsStep(RepositoryItemReader<MongoAuthor> authorReader,
-                            RepositoryItemWriter<Author> authorWriter) {
+                            CustomRepositoryItemWriter<Author, ItemBox<Author, Long, Long>> authorWriter) {
         return buildStep("authorsStep", authorReader, authorWriter, authorItemProcessor);
     }
 
     @Bean
     public Step genresStep(RepositoryItemReader<MongoGenre> genreReader,
-                           RepositoryItemWriter<Genre> genreWriter) {
+                           CustomRepositoryItemWriter<Genre, ItemBox<Genre, Long, Long>> genreWriter) {
         return buildStep("genresStep", genreReader, genreWriter, genreItemProcessor);
     }
 
     @Bean
     public Step booksStep(RepositoryItemReader<MongoBook> bookReader,
-                          RepositoryItemWriter<Book> bookWriter) {
+                          CustomRepositoryItemWriter<Book, ItemBox<Book, Long, Long>> bookWriter) {
         return buildStep("booksStep", bookReader, bookWriter, bookItemProcessor);
     }
 
     @Bean
     public Step commentStep(RepositoryItemReader<MongoComment> commentReader,
                             RepositoryItemWriter<Comment> commentWriter) {
-        return buildStep("commentStep", commentReader, commentWriter, commentItemProcessor);
+        return new StepBuilder("commentStep", jobRepository)
+                .<MongoComment, Comment>chunk(CHUNK_SIZE, platformTransactionManager)
+                .reader(commentReader)
+                .processor(commentItemProcessor)
+                .writer(commentWriter)
+                .faultTolerant()
+                .skip(NotFoundException.class)
+                .startLimit(1)
+                .build();
     }
 
     @Bean
