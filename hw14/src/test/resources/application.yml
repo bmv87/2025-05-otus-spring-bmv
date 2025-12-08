@@ -1,0 +1,59 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: maindb
+  datasource:
+    url: jdbc:h2:mem:migration
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: create-drop
+
+
+  batch:
+    jdbc:
+#      switch to never if using not temp database https://runebook.dev/en/docs/spring_boot/application-properties/application-properties.integration.spring.batch.jdbc.schema
+      initialize-schema: always
+#     reset batch job tables for each app start
+      schema: classpath:/db/target/schema-postgresql.sql
+
+  shell:
+    interactive:
+      enabled: false
+    noninteractive:
+      enabled: false
+    command:
+      version:
+        enabled: false
+
+#  main:
+#    allow-bean-definition-overriding: true
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2
+
+mongock:
+  runner-type: "InitializingBean"
+  change-logs-scan-package:
+    - ru.otus.hw.changelog
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+
+logging:
+  level:
+      root: debug
+      org.springframework.boot.autoconfigure.mongo.embedded: error
+      Batch: INFO
+      ru.otus.hw: INFO
+
+  file:
+    name: hw.log
+
+
