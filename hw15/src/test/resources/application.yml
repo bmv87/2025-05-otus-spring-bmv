@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+  sql:
+    init:
+      mode: never
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/testdata
+logging:
+  file:
+    name: hw_test.log
+cors:
+  urls:
+
+management:
+  health:
+    external:
+      enabled: true
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health,info,activity-stat,metrics
+  info:
+    build:
+      enabled: true
+    env:
+      enabled: true
+    git:
+      mode: "full"
+info:
+  app:
+    version: test-0.0.1
+    description: On-line library
