@@ -1,0 +1,36 @@
+services:
+  library-api-dockerfile:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: library-hw16-dockerfile
+    ports:
+      - "8888:8080"
+      - "8989:8090"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true"
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:maindb
+      SPRING_DATASOURCE_USERNAME: sa
+    healthcheck:
+      test: [ "CMD", "curl", "-f",  "http://localhost:8989/actuator/health" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  library-api-image:
+    image: bmv/library:0.0.2-image
+    container_name: library-hw16
+    ports:
+      - "8686:8080"
+      - "8787:8090"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true"
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:maindb
+      SPRING_DATASOURCE_USERNAME: sa
+    healthcheck:
+      test: [ "CMD", "curl", "-f",  "http://localhost:8787/actuator/health" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
