@@ -1,0 +1,82 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+  data:
+    rest:
+      default-media-type: application/json
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:maindb}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: org.h2.Driver
+    platform: h2
+  sql:
+    init:
+      mode: never
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      settings:
+        web-allow-others: true
+      enabled: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/data
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+      favicon:
+        enabled: false
+logging:
+  logging:
+    level:
+      root: debug
+  file:
+    name: logs/hw.log
+
+cors:
+  urls: ${CORS_URLS:http://localhost:3000}
+
+management:
+  server:
+    port: 8090
+  health:
+    external:
+      enabled: true
+    probes:
+      enabled: true
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    logfile:
+      enabled: true
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health,info,logfile,metrics
+  info:
+    build:
+      enabled: true
+    env:
+      enabled: true
+    git:
+      mode: "full"
+info:
+  app:
+    version: @project.version@
+    description: On-line library
+

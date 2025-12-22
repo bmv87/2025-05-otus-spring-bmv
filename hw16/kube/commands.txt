@@ -1,0 +1,35 @@
+docker buildx build -f Dockerfile -t bmv/library:0.0.2 .
+
+kind create cluster --config kube/kind-cluster.yaml
+kind load docker-image bmv/library:0.0.2 --name library-cluster
+
+
+kubectl apply -f kube/config.yaml
+kubectl apply -f kube/secret.yaml
+kubectl apply -f kube/deployments.yaml
+kubectl apply -f kube/services.yaml
+kubectl apply -f kube/ingress.yaml
+
+kind delete cluster --name library-cluster
+
+kubectl create secret docker-registry regcred --docker-server=https://registry.net:5043 --docker-username=admin --docker-password=123456 --docker-email=test@test.net
+kubectl get secret regcred --output=yaml
+
+kubectl get pods --namespace=default
+kubectl get namespaces
+kubectl get service library-entrypoint
+kubectl cluster-info --context kind-library-cluster
+
+kubectl describe pod library-app-86c85d5d94-mr2dw
+
+# Add kubernetes-dashboard repository
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+
+//for access 
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+
+kubectl apply -f kube/users.yaml
+
+kubectl -n kubernetes-dashboard create token admin-user
